@@ -95,7 +95,7 @@ export default function Home({ navigation }) {
               <Divider />
               <Card.Actions style={{ justifyContent: 'space-between' }}>
                 <IconButton
-                  icon="comment-plus-outline"
+                  icon="comment-outline"
                   onPress={() => {
                     const nodeID = state.nextID;
                     dispatch({ kind: 'create' });
@@ -109,8 +109,8 @@ export default function Home({ navigation }) {
                   <Star nodeID={item.nodeID} />
                 ) : (
                   <IconButton
-                    icon="heart"
-                    color={theme.m3.colors.primaryContainer}
+                    icon="heart-outline"
+                    color={theme.m3.colors.secondary}
                     onPress={() => {
                       dispatch({
                         kind: 'star',
