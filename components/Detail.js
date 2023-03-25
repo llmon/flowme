@@ -1,58 +1,111 @@
-import React, { useEffect, useContext } from 'react';
-import { View } from 'react-native';
-import { IconButton, Card } from 'react-native-paper';
-import Content from './Content';
+import { useContext, useMemo } from 'react';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { Card, Surface, useTheme, FAB } from 'react-native-paper';
 import { Context } from '../App';
 
-export default function Detail({ navigation, route }) {
-  const { riverID } = route.params;
-  const { state, dispatch } = useContext(Context);
-  const river = state.sea.find((item) => item.riverID === riverID);
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <IconButton
-          icon="plus"
-          disabled={river.river.length === 0}
-          onPress={() => {
-            const id = state.nextID;
-            dispatch({ kind: 'new', parent: riverID });
+import { formatDate } from './Home';
 
-            navigation.navigate('Edit', {
-              riverID: id,
-            });
-          }}
-        />
-      ),
-    });
-  }, [navigation, state, dispatch, riverID, river]);
+export default function ({ navigation, route }) {
+  const { nodeID } = route.params;
+  const { state, dispatch } = useContext(Context);
+  const theme = useTheme();
+
+  const data = useMemo(() => {
+    const data = [];
+    let id = nodeID;
+    let node = state.river.find((item) => item.nodeID === id);
+    while (node !== undefined) {
+      data.push(node);
+      id = node.parent;
+      node = state.river.find((item) => item.nodeID === id);
+    }
+    return data;
+  }, [state.river, nodeID]);
 
   return (
-    <View style={{flex: 1, justifyContent: 'center', padding: 10}}>
-      <Card>
-        <Card.Content>
-          <Content data={river.river} />
-        </Card.Content>
-        <Card.Actions>
-          <View style={{flex:1, flexDirection: 'row', justifyContent: 'flex-end'}}>
-            <IconButton
-              icon="home"
+    <>
+      <View style={styles.container}>
+        <FlatList
+          data={data}
+          renderItem={({ item }) => (
+            <Card
               onPress={() => {
-                navigation.popToTop();
+                if (item.nodeID !== nodeID) {
+                  navigation.push('Detail', {
+                    nodeID: item.nodeID,
+                  });
+                }
               }}
-            />
-            <IconButton
-              icon="arrow-right"
-              disabled={river.parent === undefined}
-              onPress={() => {
-                navigation.push('Detail', {
-                  riverID: river.parent,
-                });
-              }}
-            />
-          </View>
-        </Card.Actions>
-      </Card>
-    </View>
+              style={{ marginVertical: 8 }}>
+              <Card.Title
+                title={formatDate(item.created)}
+                titleStyle={{ fontWeight: '100', fontSize: 10 }}
+              />
+              <Card.Content>
+                <FlatList
+                  data={item.nodeValue}
+                  renderItem={({ item }) => (
+                    <Surface
+                      style={{
+                        ...styles.itemContainer,
+                        backgroundColor: theme.m3.colors.secondaryContainer,
+                      }}>
+                      <Text color={theme.m3.colors.onSecondaryContainer}>
+                        {item.waterDrop}
+                      </Text>
+                    </Surface>
+                  )}
+                  style={styles.flatList}
+                />
+              </Card.Content>
+            </Card>
+          )}
+          style={{ flex: 1 }}
+        />
+      </View>
+      <FAB
+        icon="plus"
+        color={theme.m3.colors.onPrimary}
+        style={{ ...styles.fab, backgroundColor: theme.m3.colors.primary }}
+        onPress={() => {
+          const id = state.nextID;
+          dispatch({ kind: 'create' });
+          navigation.navigate('Edit', {
+            nodeID: id,
+            parent: nodeID,
+          });
+        }}
+      />
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    marginLeft: 16,
+    marginRight: 16,
+    marginVertical: 4,
+  },
+  fab: {
+    position: 'absolute',
+    marginRight: 16,
+    marginBottom: 16,
+    right: 0,
+    bottom: 0,
+  },
+
+  flatList: {
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  itemContainer: {
+    alignSelf: 'flex-end',
+    marginVertical: 4,
+    borderRadius: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    elevation: 0,
+  },
+});

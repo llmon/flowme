@@ -1,11 +1,47 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { FlatList, View, StyleSheet, Text } from 'react-native';
-import { Button, IconButton, Card, Dialog, Portal } from 'react-native-paper';
-import Content from './Content';
+import { useContext, useState } from 'react';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
+import {
+  IconButton,
+  FAB,
+  Card,
+  Surface,
+  Divider,
+  Portal,
+  Button,
+  useTheme,
+  Dialog,
+} from 'react-native-paper';
 import { Context } from '../App';
 
+export function formatDate(date) {
+  const now = new Date();
+  const result = `${date.month}月${date.day}日 ${date.hour}:${
+    date.minutes < 10 ? '0' : ''
+  }${date.minutes}`;
+
+  if (now.getFullYear() === date.year) {
+    return result;
+  } else {
+    return `${date.year}年` + result;
+  }
+}
+function Star({ nodeID }) {
+  const { state, dispatch } = useContext(Context);
+  const theme = useTheme();
+
+  return (
+    <IconButton
+      icon="heart"
+      color={theme.m3.colors.tertiaryContainer}
+      onPress={() => {
+        dispatch({ kind: 'star', payload: { nodeID, star: false } });
+      }}
+    />
+  );
+}
 export default function Home({ navigation }) {
   const { state, dispatch } = useContext(Context);
+  const theme = useTheme();
   const [visible, setVisible] = useState(false);
   const [deleteID, setDeleteID] = useState(-1);
   const hideDialog = () => {
@@ -13,73 +49,111 @@ export default function Home({ navigation }) {
     setDeleteID(-1);
   };
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <IconButton
-          icon="plus"
-          onPress={() => {
-            const id = state.nextID;
-            dispatch({ kind: 'new' });
-
-            navigation.navigate('Edit', {
-              riverID: id,
-            });
-          }}
-        />
-      ),
-    });
-  }, [navigation, state, dispatch]);
-
-  if (state.sea.length === 0) {
-    return <View />;
-  }
-
-  const displayed = state.sea.filter(
-    (river) =>
-      state.sea.find((item) => item.parent === river.riverID) === undefined
+  const data = state.river.filter(
+    (node) =>
+      state.river.find((item) => item.parent === node.nodeID) === undefined
   );
+  data.reverse();
+
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={displayed.reverse()}
-        renderItem={({ item }) => {
-          return (
+    <>
+      <View style={styles.container}>
+        <FlatList
+          data={data}
+          renderItem={({ item }) => (
             <Card
-              style={styles.card}
               onPress={() => {
                 navigation.navigate('Detail', {
-                  riverID: item.riverID,
+                  nodeID: item.nodeID,
                 });
               }}
               onLongPress={() => {
                 setVisible(true);
-                setDeleteID(item.riverID);
-              }}>
-              <Card.Title title={item.created} titleStyle={styles.cardTitle} />
+                setDeleteID(item.nodeID);
+              }}
+              style={{ marginVertical: 8 }}>
+              <Card.Title
+                title={formatDate(item.created)}
+                titleStyle={{ fontWeight: '100', fontSize: 10 }}
+              />
               <Card.Content>
-                <Content data={item.river} />
+                <FlatList
+                  data={item.nodeValue}
+                  renderItem={({ item }) => (
+                    <Surface
+                      style={{
+                        ...styles.itemContainer,
+                        backgroundColor: theme.m3.colors.secondaryContainer,
+                      }}>
+                      <Text color={theme.m3.colors.onSecondaryContainer}>
+                        {item.waterDrop}
+                      </Text>
+                    </Surface>
+                  )}
+                  style={styles.flatList}
+                />
               </Card.Content>
+              <Divider />
+              <Card.Actions style={{ justifyContent: 'space-between' }}>
+                <IconButton
+                  icon="comment-plus-outline"
+                  onPress={() => {
+                    const nodeID = state.nextID;
+                    dispatch({ kind: 'create' });
+                    navigation.navigate('Edit', {
+                      nodeID,
+                      parent: item.nodeID,
+                    });
+                  }}
+                />
+                {item.star ? (
+                  <Star nodeID={item.nodeID} />
+                ) : (
+                  <IconButton
+                    icon="heart"
+                    color={theme.m3.colors.primaryContainer}
+                    onPress={() => {
+                      dispatch({
+                        kind: 'star',
+                        payload: { nodeID: item.nodeID, star: true },
+                      });
+                    }}
+                  />
+                )}
+              </Card.Actions>
             </Card>
-          );
+          )}
+          style={{ flex: 1 }}
+        />
+        <Portal>
+          <Dialog visible={visible} onDismiss={hideDialog}>
+            <Dialog.Title>{'确认删除?'}</Dialog.Title>
+            <Dialog.Actions>
+              <Button
+                onPress={() => {
+                  dispatch({ kind: 'delete', payload: { nodeID: deleteID } });
+                  hideDialog();
+                }}>
+                {'是'}
+              </Button>
+              <Button onPress={hideDialog}>{'否'}</Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </View>
+      <FAB
+        icon="plus"
+        color={theme.m3.colors.onPrimary}
+        style={{ ...styles.fab, backgroundColor: theme.m3.colors.primary }}
+        onPress={() => {
+          const nodeID = state.nextID;
+          dispatch({ kind: 'create' });
+          navigation.navigate('Edit', {
+            nodeID,
+          });
         }}
       />
-      <Portal>
-        <Dialog visible={visible} onDismiss={hideDialog}>
-          <Dialog.Title>{'确认删除?'}</Dialog.Title>
-          <Dialog.Actions>
-            <Button
-              onPress={() => {
-                dispatch({ kind: 'delete', riverID: deleteID });
-                hideDialog();
-              }}>
-              {'是'}
-            </Button>
-            <Button onPress={hideDialog}>{'否'}</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-    </View>
+    </>
   );
 }
 
@@ -87,13 +161,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    paddingLeft: 10,
-    paddingRight: 10,
+    marginLeft: 16,
+    marginRight: 16,
+    marginVertical: 4,
   },
-  card: {
-    marginTop: 8,
+  fab: {
+    position: 'absolute',
+    marginRight: 16,
+    marginBottom: 16,
+    right: 0,
+    bottom: 0,
   },
-  cardTitle: {
-    fontSize: 10,
+  flatList: {
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  itemContainer: {
+    alignSelf: 'flex-end',
+    marginVertical: 4,
+    borderRadius: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    elevation: 0,
   },
 });

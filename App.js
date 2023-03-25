@@ -1,131 +1,82 @@
-import React, { useEffect, createContext, useReducer, useContext } from 'react';
+import { useEffect, useState, createContext, useReducer } from 'react';
+import { StatusBar } from 'react-native';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { IconButton, Provider as PaperProvider } from 'react-native-paper';
+import {
+  IconButton,
+  Provider as PaperProvider,
+} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Home from './components/Home';
 import Edit from './components/Edit';
-import Detail from './components/Detail';
-
-const initState = { sea: [], nextID: 0 };
-
-// sea <- river <- waterDrop
-function reducer(state, action) {
-  const saveRiver = async (id, river) => {
-    const jsonValue = JSON.stringify(river);
-    await AsyncStorage.setItem('river' + id, jsonValue);
-  };
-  const saveNextId = async (nextID) => {
-    const val = JSON.stringify(nextID);
-    await AsyncStorage.setItem('nextID', val);
-  };
-  switch (action.kind) {
-    case 'loaded': {
-      if (action.sea !== undefined && action.nextID !== undefined) {
-        return { sea: action.sea, nextID: action.nextID };
-      } else {
-        return initState;
-      }
-    }
-    case 'new': {
-      const id = state.nextID;
-      const now = new Date();
-
-      const newState = {
-        sea: [
-          ...state.sea,
-          {
-            riverID: id,
-            river: [],
-            created: now.toLocaleString('zh-CN'),
-          },
-        ],
-        nextID: state.nextID + 1,
-      };
-      if (action.parent !== undefined) {
-        newState.sea[newState.sea.length - 1].parent = action.parent;
-      }
-      saveNextId(newState.nextID);
-      saveRiver(id, newState.sea[newState.sea.length - 1]);
-      return newState;
-    }
-    case 'send': {
-      // TODO: it may break
-      const editing = {
-        ...state.sea[state.sea.length - 1],
-      };
-      editing.river.push({ text: action.text });
-      saveRiver(action.riverID, editing);
-      const newState = {
-        ...state,
-        sea: state.sea.slice(),
-      };
-      newState.sea[newState.sea.length - 1] = editing;
-      return newState;
-    }
-    case 'delete': {
-      AsyncStorage.removeItem('river' + action.riverID);
-      return {
-        ...state,
-        sea: state.sea.filter((item) => item.riverID !== action.riverID),
-      };
-    }
-  }
-}
+import Detail from './components/Detail'
+import reducer from './reducer';
+import {theme as paperTheme} from './theme'
 
 export const Context = createContext(null);
 const Stack = createNativeStackNavigator();
 
+// read from storage
+const initState = { nextID: 0, river: [] };
+let didInit = false;
+
 export default function () {
+  const [theme, setTheme] = useState(paperTheme);
   const [state, dispatch] = useReducer(reducer, initState);
 
   useEffect(() => {
+    if (didInit) {
+      return;
+    }
     (async () => {
       let nextID = await AsyncStorage.getItem('nextID');
       if (nextID === null) {
-        dispatch({ kind: 'loaded' });
         return;
       }
       nextID = JSON.parse(nextID);
 
-      const sea = [];
+      const river = [];
       for (let i = 0; i < nextID; i++) {
-        const river = await AsyncStorage.getItem('river' + i);
-        if (river !== null) {
-          sea.push(JSON.parse(river));
+        const node = await AsyncStorage.getItem('node' + i);
+        if (node !== null) {
+          river.push(JSON.parse(node));
         }
       }
-      dispatch({ kind: 'loaded', sea, nextID });
+      dispatch({ kind: 'loaded', payload: { nextID, river } });
     })();
   }, []);
   return (
     <Context.Provider value={{ state, dispatch }}>
-      <PaperProvider>
+      <PaperProvider theme={theme}>
+        <StatusBar
+          barStyle={theme.dark ? 'light-content' : 'dark-content'}
+          backgroundColor={theme.colors.background}
+        />
         <NavigationContainer>
           <Stack.Navigator>
             <Stack.Screen
               name="Home"
               component={Home}
-              options={() => ({
-                title: 'flowme',
-                headerRight: () => <IconButton icon="plus" />,
-              })}
+              options={{
+                title: 'flow',
+                headerTitleAlign: 'center',
+              }}
             />
             <Stack.Screen
               name="Edit"
               component={Edit}
-              options={() => ({
+              options={{
                 title: '',
-              })}
+              }}
             />
             <Stack.Screen
               name="Detail"
               component={Detail}
-              options={() => ({
+              options={{
                 title: '',
-                headerRight: () => <IconButton icon="plus" disabled />,
-              })}
+              }}
             />
           </Stack.Navigator>
         </NavigationContainer>
