@@ -4,7 +4,7 @@ import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
-  IconButton,
+  Button,
   Provider as PaperProvider,
 } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './components/Home';
 import Edit from './components/Edit';
 import Detail from './components/Detail'
+import Post from './components/Post'
 import reducer from './reducer';
 import { theme as paperTheme } from './theme'
 
@@ -76,6 +77,14 @@ export default function () {
               component={Detail}
               options={{
                 title: '',
+              }}
+            />
+            <Stack.Screen
+              name="Post"
+              component={Post}
+              options={{
+                title: '',
+                headerRight: () => <Button mode="contained" disabled style={{ marginRight: 16 }}>{'发送'}</Button>,
               }}
             />
           </Stack.Navigator>

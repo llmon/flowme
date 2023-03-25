@@ -37,27 +37,37 @@ export default function ({ navigation, route }) {
                 }
               }}
               style={{ marginVertical: 4 }}>
+              {item.moment !== undefined && item.image && (
+                <Card.Cover source={item.image} />
+              )}
               <Card.Title
                 title={formatDate(item.created)}
                 titleStyle={{ fontWeight: '500', fontSize: 11 }}
               />
-              <Card.Content>
-                <FlatList
-                  data={item.nodeValue}
-                  renderItem={({ item }) => (
-                    <Surface
-                      style={{
-                        ...styles.itemContainer,
-                        backgroundColor: theme.m3.colors.secondaryContainer,
-                      }}>
-                      <Text color={theme.m3.colors.onSecondaryContainer}>
-                        {item.waterDrop}
-                      </Text>
-                    </Surface>
-                  )}
-                  style={styles.flatList}
-                />
-              </Card.Content>
+              {item.moment !== undefined && item.text && (
+                <Card.Content>
+                  <Text>{item.text}</Text>
+                </Card.Content>
+              )}
+              {item.moment === undefined && (
+                <Card.Content>
+                  <FlatList
+                    data={item.nodeValue}
+                    renderItem={({ item }) => (
+                      <Surface
+                        style={{
+                          ...styles.itemContainer,
+                          backgroundColor: theme.m3.colors.secondaryContainer,
+                        }}>
+                        <Text color={theme.m3.colors.onSecondaryContainer}>
+                          {item.waterDrop}
+                        </Text>
+                      </Surface>
+                    )}
+                    style={styles.flatList}
+                  />
+                </Card.Content>
+              )}
             </Card>
           )}
           style={{ flex: 1 }}
@@ -71,6 +81,14 @@ export default function ({ navigation, route }) {
           const id = state.nextID;
           dispatch({ kind: 'create' });
           navigation.navigate('Edit', {
+            nodeID: id,
+            parent: nodeID,
+          });
+        }}
+        onLongPress={() => {
+          const id = state.nextID;
+          dispatch({ kind: 'create' });
+          navigation.navigate('Post', {
             nodeID: id,
             parent: nodeID,
           });
