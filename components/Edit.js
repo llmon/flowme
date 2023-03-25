@@ -14,7 +14,7 @@ export default function ({ navigation, route }) {
 
   useEffect(() => {
     navigation.addListener('beforeRemove', (e) => {
-      if (route.params.parent === undefined) {
+      if (route.params.parent === undefined || text === '') {
         return;
       }
       route.params.parent = undefined;
