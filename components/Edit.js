@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { Text, View, StyleSheet, FlatList } from 'react-native';
 import { IconButton, TextInput, Surface, useTheme } from 'react-native-paper';
+import Constants from 'expo-constants'
 import { Context } from '../App';
 
 export default function ({ navigation, route }) {
@@ -12,14 +13,14 @@ export default function ({ navigation, route }) {
 
   if (route.params.parent !== undefined) {
     useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <IconButton icon="arrow-left" onPress={() => {
-          navigation.navigate('Home');
-        }}
-        />
-      )
-    });
+      navigation.setOptions({
+        headerLeft: () => (
+          <IconButton icon="arrow-left" onPress={() => {
+            navigation.navigate('Home');
+          }}
+          />
+        )
+      });
     }, [navigation])
   }
 
@@ -80,7 +81,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     marginHorizontal: 16,
-    marginBottom: 4,
+    marginBottom: 8,
+    paddingTop: Constants.statusBarHeight,
   },
   flatList: {
     justifyContent: 'flex-end',

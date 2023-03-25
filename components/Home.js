@@ -15,9 +15,8 @@ import { Context } from '../App';
 
 export function formatDate(date) {
   const now = new Date();
-  const result = `${date.month}月${date.day}日 ${date.hour}:${
-    date.minutes < 10 ? '0' : ''
-  }${date.minutes}`;
+  const result = `${date.month}月${date.day}日 ${date.hour}:${date.minutes < 10 ? '0' : ''
+    }${date.minutes}`;
 
   if (now.getFullYear() === date.year) {
     return result;
@@ -71,10 +70,10 @@ export default function Home({ navigation }) {
                 setVisible(true);
                 setDeleteID(item.nodeID);
               }}
-              style={{ marginVertical: 8 }}>
+              style={{ marginVertical: 4 }}>
               <Card.Title
                 title={formatDate(item.created)}
-                titleStyle={{ fontWeight: '100', fontSize: 10 }}
+                titleStyle={{ fontWeight: '500', fontSize: 11 }}
               />
               <Card.Content>
                 <FlatList

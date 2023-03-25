@@ -36,10 +36,10 @@ export default function ({ navigation, route }) {
                   });
                 }
               }}
-              style={{ marginVertical: 8 }}>
+              style={{ marginVertical: 4 }}>
               <Card.Title
                 title={formatDate(item.created)}
-                titleStyle={{ fontWeight: '100', fontSize: 10 }}
+                titleStyle={{ fontWeight: '500', fontSize: 11 }}
               />
               <Card.Content>
                 <FlatList

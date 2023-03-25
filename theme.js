@@ -2,6 +2,11 @@ import { DefaultTheme } from 'react-native-paper';
 
 export const theme = {
   ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: 'rgb(52, 61, 255)',
+    accent: 'rgb(92, 93, 114)',
+  },
   m3: {
     colors: {
       primary: 'rgb(52, 61, 255)',

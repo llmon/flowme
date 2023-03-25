@@ -13,7 +13,7 @@ import Home from './components/Home';
 import Edit from './components/Edit';
 import Detail from './components/Detail'
 import reducer from './reducer';
-import {theme as paperTheme} from './theme'
+import { theme as paperTheme } from './theme'
 
 export const Context = createContext(null);
 const Stack = createNativeStackNavigator();
@@ -52,7 +52,6 @@ export default function () {
       <PaperProvider theme={theme}>
         <StatusBar
           barStyle={theme.dark ? 'light-content' : 'dark-content'}
-          backgroundColor={theme.colors.background}
         />
         <NavigationContainer>
           <Stack.Navigator>
@@ -69,6 +68,7 @@ export default function () {
               component={Edit}
               options={{
                 title: '',
+                headerTransparent: true,
               }}
             />
             <Stack.Screen
