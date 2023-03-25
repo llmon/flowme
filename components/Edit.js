@@ -11,18 +11,16 @@ export default function ({ navigation, route }) {
   const { dispatch } = useContext(Context);
   const theme = useTheme();
 
-  if (route.params.parent !== undefined) {
-    useEffect(() => {
-      navigation.setOptions({
-        headerLeft: () => (
-          <IconButton icon="arrow-left" onPress={() => {
-            navigation.navigate('Home');
-          }}
-          />
-        )
-      });
-    }, [navigation])
-  }
+  useEffect(() => {
+    navigation.addListener('beforeRemove', (e) => {
+      if (route.params.parent === undefined) {
+        return;
+      }
+      route.params.parent = undefined;
+      e.preventDefault();
+      navigation.dispatch(StackActions.popToTop());
+    })
+  }, [navigation, route.params])
 
   const send = (text) => {
     if (text.length !== 0) {
@@ -57,18 +55,13 @@ export default function ({ navigation, route }) {
         value={text}
         onChangeText={setText}
         mode="outlined"
-        onKeyPress={({ key }) => {
-          if (key === 'Enter') {
-            send(text);
-          }
-        }}
         right={
           <TextInput.Icon
             icon="send"
             disabled={text.length === 0}
-            onPress={() => {
-              send(text);
-            }}
+            onPress={() =>
+              send(text)
+            }
           />
         }
       />
