@@ -48,8 +48,6 @@ export default function Post({ navigation, route }) {
 
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
-    } else {
-      alert('You did not select any image.');
     }
   };
 
@@ -76,7 +74,7 @@ export default function Post({ navigation, route }) {
       )}
       {selectedImage && (
         <Card>
-          <Card.Cover source={selectedImage} />
+          <Card.Cover source={{ uri: selectedImage }} />
         </Card>
       )}
       {selectedImage && (
