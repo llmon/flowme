@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { Card, Surface, useTheme, FAB } from 'react-native-paper';
 import { Context } from '../App';
 import CustomFAB from './CustomFAB';
+import CustomCardContent from './CustomCardContent';
 
-import { formatDate } from './Home';
 
 export default function ({ navigation, route }) {
   const { nodeID } = route.params;
-  const { state, dispatch } = useContext(Context);
+  const { state } = useContext(Context);
   const theme = useTheme();
 
   const data = useMemo(() => {
@@ -38,37 +38,7 @@ export default function ({ navigation, route }) {
                 }
               }}
               style={{ marginVertical: 4 }}>
-              {item.moment !== undefined && item.image && (
-                <Card.Cover source={item.image} />
-              )}
-              <Card.Title
-                title={formatDate(item.created)}
-                titleStyle={{ fontWeight: '500', fontSize: 11 }}
-              />
-              {item.moment !== undefined && item.text && (
-                <Card.Content>
-                  <Text>{item.text}</Text>
-                </Card.Content>
-              )}
-              {item.moment === undefined && (
-                <Card.Content>
-                  <FlatList
-                    data={item.nodeValue}
-                    renderItem={({ item }) => (
-                      <Surface
-                        style={{
-                          ...styles.itemContainer,
-                          backgroundColor: theme.m3.colors.secondaryContainer,
-                        }}>
-                        <Text color={theme.m3.colors.onSecondaryContainer}>
-                          {item.waterDrop}
-                        </Text>
-                      </Surface>
-                    )}
-                    style={styles.flatList}
-                  />
-                </Card.Content>
-              )}
+              <CustomCardContent item={item} />
             </Card>
           )}
           style={{ flex: 1 }}
@@ -86,17 +56,5 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
     marginVertical: 4,
-  },
-  flatList: {
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-  },
-  itemContainer: {
-    alignSelf: 'flex-end',
-    marginVertical: 4,
-    borderRadius: 4,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    elevation: 0,
   },
 });
