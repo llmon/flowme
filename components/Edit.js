@@ -14,14 +14,14 @@ export default function ({ navigation, route }) {
 
   useEffect(() => {
     navigation.addListener('beforeRemove', (e) => {
-      if (route.params.parent === undefined || text === '') {
+      if (route.params.parent === undefined || data.length === 0) {
         return;
       }
       route.params.parent = undefined;
       e.preventDefault();
       navigation.dispatch(StackActions.popToTop());
     })
-  }, [navigation, route.params])
+  }, [navigation, route.params, data])
 
   const send = (text) => {
     if (text.length !== 0) {
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     marginHorizontal: 16,
     marginBottom: 12,
-    paddingTop: Constants.statusBarHeight + 64,
+    paddingTop: Constants.statusBarHeight,
   },
   flatList: {
     justifyContent: 'flex-end',
