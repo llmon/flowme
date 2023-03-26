@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import {
   IconButton,
   Card,

@@ -1,6 +1,6 @@
 import { useContext, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { Card, Surface, useTheme, FAB } from 'react-native-paper';
+import { View, StyleSheet, FlatList } from 'react-native';
+import { Card } from 'react-native-paper';
 import { Context } from '../App';
 import CustomFAB from './CustomFAB';
 import CustomCardContent from './CustomCardContent';
@@ -9,7 +9,6 @@ import CustomCardContent from './CustomCardContent';
 export default function ({ navigation, route }) {
   const { nodeID } = route.params;
   const { state } = useContext(Context);
-  const theme = useTheme();
 
   const data = useMemo(() => {
     const data = [];
