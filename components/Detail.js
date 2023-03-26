@@ -2,6 +2,7 @@ import { useContext, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { Card, Surface, useTheme, FAB } from 'react-native-paper';
 import { Context } from '../App';
+import CustomFAB from './CustomFAB';
 
 import { formatDate } from './Home';
 
@@ -73,27 +74,7 @@ export default function ({ navigation, route }) {
           style={{ flex: 1 }}
         />
       </View>
-      <FAB
-        icon="plus"
-        color={theme.m3.colors.onPrimary}
-        style={{ ...styles.fab, backgroundColor: theme.m3.colors.primary }}
-        onPress={() => {
-          const id = state.nextID;
-          dispatch({ kind: 'create' });
-          navigation.navigate('Edit', {
-            nodeID: id,
-            parent: nodeID,
-          });
-        }}
-        onLongPress={() => {
-          const id = state.nextID;
-          dispatch({ kind: 'create' });
-          navigation.navigate('Post', {
-            nodeID: id,
-            parent: nodeID,
-          });
-        }}
-      />
+      <CustomFAB parent={nodeID} />
     </>
   );
 }
@@ -106,14 +87,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
     marginVertical: 4,
   },
-  fab: {
-    position: 'absolute',
-    marginRight: 16,
-    marginBottom: 16,
-    right: 0,
-    bottom: 0,
-  },
-
   flatList: {
     justifyContent: 'flex-end',
     alignItems: 'flex-end',

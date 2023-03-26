@@ -12,6 +12,7 @@ import {
   Dialog,
 } from 'react-native-paper';
 import { Context } from '../App';
+import CustomFAB from './CustomFAB';
 
 export function formatDate(date) {
   const now = new Date();
@@ -150,25 +151,7 @@ export default function Home({ navigation }) {
           </Dialog>
         </Portal>
       </View>
-      <FAB
-        icon="plus"
-        color={theme.m3.colors.onPrimary}
-        style={{ ...styles.fab, backgroundColor: theme.m3.colors.primary }}
-        onPress={() => {
-          const nodeID = state.nextID;
-          dispatch({ kind: 'create' });
-          navigation.navigate('Edit', {
-            nodeID,
-          });
-        }}
-        onLongPress={() => {
-          const nodeID = state.nextID;
-          dispatch({ kind: 'create' });
-          navigation.navigate('Post', {
-            nodeID,
-          });
-        }}
-      />
+      <CustomFAB />
     </>
   );
 }
@@ -180,13 +163,6 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
     marginVertical: 4,
-  },
-  fab: {
-    position: 'absolute',
-    marginRight: 16,
-    marginBottom: 16,
-    right: 0,
-    bottom: 0,
   },
   flatList: {
     justifyContent: 'flex-end',
